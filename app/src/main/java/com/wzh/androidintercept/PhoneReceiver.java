@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
 
@@ -27,7 +28,9 @@ public class PhoneReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "onReceive context=" + intent.getAction() + " intent=" + intent);
-        if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+            Toast.makeText(context, "开机完毕~", Toast.LENGTH_LONG).show();
+        }else if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
             // 如果是去电（拨出）
         } else {
             Bundle bundle=intent.getExtras();
