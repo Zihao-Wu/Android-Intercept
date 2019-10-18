@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import com.wzh.androidintercept.R;
 import com.wzh.androidintercept.databinding.FragmentHomeBinding;
+import com.wzh.androidintercept.ui.InterceptRecordActivity;
 import com.wzh.androidintercept.ui.PhoneListActivity;
 import com.wzh.androidintercept.utils.PreferceHelper;
 
@@ -55,9 +56,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         Intent intent;
         switch (v.getId()) {
-            case R.id.phone_switch:
-
-                break;
             case R.id.tv_black:
                 intent=new Intent(getContext(), PhoneListActivity.class);
                 intent.putExtra(PhoneListActivity.IS_BLACK,true);
@@ -72,7 +70,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                 break;
             case R.id.tv_record:
-
+                intent=new Intent(getContext(), InterceptRecordActivity.class);
+                intent.putExtra(PhoneListActivity.IS_BLACK,false);
+                startActivity(intent);
                 break;
             default:
 
