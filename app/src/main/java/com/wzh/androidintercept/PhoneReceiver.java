@@ -16,6 +16,7 @@ import com.android.internal.telephony.ITelephony;
 import com.wzh.androidintercept.bean.CheckPhoneResult;
 import com.wzh.androidintercept.bean.InterceptItem;
 import com.wzh.androidintercept.bean.PhoneBean;
+import com.wzh.androidintercept.bean.PhoneMappingItem;
 import com.wzh.androidintercept.network.NetWorkUtils;
 import com.wzh.androidintercept.utils.PreferceHelper;
 
@@ -63,51 +64,62 @@ public class PhoneReceiver extends BroadcastReceiver {
             final String incomingNumber = bundle.getString("incoming_number");
             if ("RINGING".equals(state) && !TextUtils.isEmpty(incomingNumber)) {
 
-                Log.d(TAG, "开始判断="+incomingNumber);
-                boolean isEnable = new PreferceHelper<Boolean>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_INTERCEPT_ENABLE).getValue(true);
-                if (!isEnable) {
-                    showToast("拦截器已关闭");
-                    return;
-                }
-
-                final PhoneBean phoneBean = new PhoneBean(incomingNumber);
-                List<PhoneBean> whiteList = getWhiteList();
-                if (whiteList.contains(phoneBean)) {
-                    showToast("白名单号码: " + incomingNumber + " 不拦截");
-                    return;
-                }
-                List<PhoneBean> blackList = getBlackList();
-                if (blackList.contains(phoneBean)) {
-                    showToast("黑名单号码: " + incomingNumber + " 拦截");
-                    stopCall();
-
-                    phoneBean.identity = "黑名单 号码拦截";
-                    saveIntercept(phoneBean);
-                    return;
-                } else {//
-                    NetWorkUtils.checkPhoneAsync(incomingNumber, new Action1<CheckPhoneResult>() {
-                        @Override
-                        public void call(CheckPhoneResult result) {
-                            Log.d(TAG, "success:" + result);
-                            if (result != null && result.getStatus() == 1) {
-                                showToast("骚扰电话: " + incomingNumber + " 拦截");
-                                stopCall();
-
-                                phoneBean.identity = "骚扰号码 拦截";
-                                saveIntercept(phoneBean);
-                            } else {
-                                showToast("非骚扰电话: " + incomingNumber + " 不拦截");
-                            }
-                        }
-                    }, null);
-
-                }
+                intercept(incomingNumber);
 
                 /*TelephonyManager tm = (TelephonyManager) context.getSystemService(Service.TELEPHONY_SERVICE);
                 // 设置一个监听器
                 tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);*/
             }
         }
+    }
+
+    private void intercept(String origPhone) {
+        Log.d(TAG, "开始判断="+origPhone);
+        boolean isEnable = isEnableIntercept();
+        if (!isEnable) {
+            showToast("拦截器已关闭");
+            return;
+        }
+
+        List<PhoneMappingItem> mapps=getMappingList();
+        for(PhoneMappingItem item:mapps){
+            if(item.equals(origPhone)){//映射
+                origPhone=item.getMappingPhone();
+            }
+        }
+        final PhoneBean phoneBean = new PhoneBean(origPhone);
+        List<PhoneBean> whiteList = getWhiteList();
+        if (whiteList.contains(phoneBean)) {
+            showToast("白名单号码: " + origPhone + " 不拦截");
+        }else if (getBlackList().contains(phoneBean)) {
+            showToast("黑名单号码: " + origPhone + " 拦截");
+            stopCall();
+
+            phoneBean.identity = "黑名单 号码拦截";
+            saveIntercept(phoneBean);
+        } else {//
+            final String phone=origPhone;
+            NetWorkUtils.checkPhoneAsync(phone, new Action1<CheckPhoneResult>() {
+                @Override
+                public void call(CheckPhoneResult result) {
+                    Log.d(TAG, "success:" + result);
+                    if (result != null && result.getStatus() == 1) {
+                        showToast("骚扰电话: " + phone + " 拦截");
+                        stopCall();
+
+                        phoneBean.identity = "骚扰号码 拦截";
+                        saveIntercept(phoneBean);
+                    } else {
+                        showToast("非骚扰电话: " + phone + " 不拦截");
+                    }
+                }
+            }, null);
+
+        }
+    }
+
+    private Boolean isEnableIntercept() {
+        return new PreferceHelper<Boolean>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_INTERCEPT_ENABLE).getValue(true);
     }
 
     PhoneStateListener listener = new PhoneStateListener() {
@@ -130,44 +142,7 @@ public class PhoneReceiver extends BroadcastReceiver {
                     if (TextUtils.isEmpty(incomingNumber))
                         return;
 
-                    boolean isEnable = new PreferceHelper<Boolean>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_INTERCEPT_ENABLE).getValue(true);
-                    if (!isEnable) {
-//                        showToast("拦截器已关闭");
-                        return;
-                    }
-
-                    final PhoneBean phoneBean = new PhoneBean(incomingNumber);
-                    List<PhoneBean> whiteList = getWhiteList();
-                    if (whiteList.contains(phoneBean)) {
-                        showToast("白名单号码: " + incomingNumber + " 不拦截");
-                        return;
-                    }
-                    List<PhoneBean> blackList = getBlackList();
-                    if (blackList.contains(phoneBean)) {
-                        showToast("黑名单号码: " + incomingNumber + " 拦截");
-                        stopCall();
-
-                        phoneBean.identity = "黑名单 号码拦截";
-                        saveIntercept(phoneBean);
-                        return;
-                    } else {//
-                        NetWorkUtils.checkPhoneAsync(incomingNumber, new Action1<CheckPhoneResult>() {
-                            @Override
-                            public void call(CheckPhoneResult result) {
-                                Log.d(TAG, "success:" + result);
-                                if (result != null && result.getStatus() == 1) {
-                                    showToast("骚扰电话: " + incomingNumber + " 拦截");
-                                    stopCall();
-
-                                    phoneBean.identity = "骚扰号码 拦截";
-                                    saveIntercept(phoneBean);
-                                } else {
-                                    showToast("非骚扰电话: " + incomingNumber + " 不拦截");
-                                }
-                            }
-                        }, null);
-
-                    }
+                    intercept(incomingNumber);
                     break;
             }
         }
@@ -187,6 +162,10 @@ public class PhoneReceiver extends BroadcastReceiver {
         return new PreferceHelper<List<PhoneBean>>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_BLACK_LIST).getValue(new ArrayList<PhoneBean>());
     }
 
+    private List<PhoneMappingItem> getMappingList() {
+        return new PreferceHelper<List<PhoneMappingItem>>(PreferceHelper.FILE_MAPPING, PreferceHelper.KEY_MAPPING_LIST).getValue(new ArrayList<PhoneMappingItem>());
+    }
+
     private void saveIntercept(PhoneBean phoneBean) {
         PreferceHelper<List<InterceptItem>> interceptList = new PreferceHelper<>(PreferceHelper.FILE_RECORD, PreferceHelper.KEY_INTERCEPT_LIST);
         List<InterceptItem> list = interceptList.getValue(new ArrayList<InterceptItem>());
@@ -194,7 +173,7 @@ public class PhoneReceiver extends BroadcastReceiver {
         item.phone = phoneBean.phone;
         item.identity = phoneBean.identity;
         item.time = System.currentTimeMillis();
-        list.add(item);
+        list.add(0,item);
         interceptList.saveValue(list);
     }
 
