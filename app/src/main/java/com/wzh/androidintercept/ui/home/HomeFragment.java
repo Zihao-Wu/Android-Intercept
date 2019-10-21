@@ -15,6 +15,7 @@ import com.wzh.androidintercept.R;
 import com.wzh.androidintercept.databinding.FragmentHomeBinding;
 import com.wzh.androidintercept.ui.InterceptRecordActivity;
 import com.wzh.androidintercept.ui.PhoneListActivity;
+import com.wzh.androidintercept.ui.PhoneMappingActivity;
 import com.wzh.androidintercept.utils.PreferceHelper;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
@@ -31,7 +32,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initData() {
-        mPreferce=new PreferceHelper<Boolean>(PreferceHelper.FILE_MAIN,PreferceHelper.KEY_INTERCEPT_ENABLE);
+        mPreferce = new PreferceHelper<Boolean>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_INTERCEPT_ENABLE);
 
     }
 
@@ -57,21 +58,22 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         Intent intent;
         switch (v.getId()) {
             case R.id.tv_black:
-                intent=new Intent(getContext(), PhoneListActivity.class);
-                intent.putExtra(PhoneListActivity.IS_BLACK,true);
+                intent = new Intent(getContext(), PhoneListActivity.class);
+                intent.putExtra(PhoneListActivity.IS_BLACK, true);
                 startActivity(intent);
                 break;
             case R.id.tv_white:
-                intent=new Intent(getContext(), PhoneListActivity.class);
-                intent.putExtra(PhoneListActivity.IS_BLACK,false);
+                intent = new Intent(getContext(), PhoneListActivity.class);
+                intent.putExtra(PhoneListActivity.IS_BLACK, false);
                 startActivity(intent);
                 break;
             case R.id.tv_mapping:
-
+                intent = new Intent(getContext(), PhoneMappingActivity.class);
+                startActivity(intent);
                 break;
             case R.id.tv_record:
-                intent=new Intent(getContext(), InterceptRecordActivity.class);
-                intent.putExtra(PhoneListActivity.IS_BLACK,false);
+                intent = new Intent(getContext(), InterceptRecordActivity.class);
+                intent.putExtra(PhoneListActivity.IS_BLACK, false);
                 startActivity(intent);
                 break;
             default:

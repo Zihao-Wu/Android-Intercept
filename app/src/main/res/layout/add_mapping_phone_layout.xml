@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/origin_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:text="原始号码："
+        android:textColor="@color/tv_black"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/origin_ed_phone"
+        android:layout_width="0px"
+        android:layout_height="40dp"
+        android:background="@null"
+        android:gravity="center_vertical|right"
+        android:hint="请输入原始电话号码"
+        android:inputType="number"
+        android:maxLength="20"
+        android:maxLines="1"
+        android:paddingRight="40dp"
+        android:textColor="@color/tv_black"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toRightOf="@+id/origin_title_tv"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/line"
+        app:layout_constraintTop_toBottomOf="@id/origin_title_tv" />
+
+    <TextView
+        android:id="@+id/mapping_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:text="映射号码："
+        android:textColor="@color/tv_black"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/line" />
+
+    <EditText
+        android:id="@+id/mapping_ed_phone"
+        android:layout_width="0px"
+        android:layout_height="40dp"
+        android:background="@null"
+        android:gravity="center_vertical|right"
+        android:hint="请输入映射电话号码"
+        android:inputType="number"
+        android:maxLength="20"
+        android:maxLines="1"
+        android:paddingRight="40dp"
+        android:textColor="@color/tv_black"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toRightOf="@+id/origin_title_tv"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mapping_title_tv" />
+</androidx.constraintlayout.widget.ConstraintLayout>
