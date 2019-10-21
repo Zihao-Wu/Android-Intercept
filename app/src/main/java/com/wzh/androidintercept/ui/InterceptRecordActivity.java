@@ -47,7 +47,8 @@ public class InterceptRecordActivity extends BaseActivity {
         binding.recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         mAdapter = new MyAdapter();
-        mAdapter.setData(mPreferHelper.getValue());
+        List<InterceptItem> list=mPreferHelper.getValue();
+        mAdapter.setData(list);
         binding.recycler.setAdapter(mAdapter);
     }
 

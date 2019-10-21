@@ -75,6 +75,9 @@ public class PhoneMappingActivity extends BaseActivity {
                             mPreferHelper.saveValue(list);
                             mAdapter.notifyItemInserted(0);
                             binding.recyclerView.smoothScrollToPosition(0);
+                        }else{
+                            Toast.makeText(PhoneMappingActivity.this, "原始电话号码已存在哦~", Toast.LENGTH_SHORT).show();
+                            return;
                         }
                     }
                 }).create();

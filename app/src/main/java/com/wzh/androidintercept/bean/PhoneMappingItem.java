@@ -1,6 +1,7 @@
 package com.wzh.androidintercept.bean;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author faqi.tao
@@ -43,5 +44,24 @@ public class PhoneMappingItem implements Serializable {
 
     public void setCreateTime(long createTime) {
         this.createTime = createTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof PhoneMappingItem) {
+            PhoneMappingItem that = (PhoneMappingItem) o;
+            return Objects.equals(originPhone, that.originPhone);
+        } else if (o instanceof String) {
+            String orig = (String) o;
+            return Objects.equals(originPhone, orig);
+        }
+        return false;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return originPhone != null ? originPhone.hashCode() : 0;
     }
 }
