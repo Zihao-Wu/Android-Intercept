@@ -107,7 +107,7 @@ public class PhoneMappingActivity extends BaseActivity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder,final int position) {
             PhoneMappingItem item = getItem(position);
             holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
