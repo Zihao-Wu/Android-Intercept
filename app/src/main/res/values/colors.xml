@@ -6,7 +6,12 @@
     <color name="tv_black">#070707</color>
     <color name="tv_gray">#DBDBDB</color>
     <color name="line">#dddddd</color>
+    <color name="white">#ffffff</color>
+    <color name="black_333333">#333333</color>
+    <color name="gray_E5E5E5">#E5E5E5</color>
+    <color name="black_50">#50000000</color>
 
 
 
+    <color name="blue_1AC4E2">#1AC4E2</color>
 </resources>

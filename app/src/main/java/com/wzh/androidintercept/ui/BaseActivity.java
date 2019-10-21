@@ -6,6 +6,9 @@ import android.view.MenuItem;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.wzh.androidintercept.R;
+import com.wzh.androidintercept.utils.statusBarUtil.StatusBarUtil;
+
 /**
  * FileName: BaseActivity
  * Author: zhihao.wu@ttpai.cn
@@ -16,7 +19,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        StatusBarUtil.setStatusBarColor(this, getResources().getColor(R.color.colorPrimary));
         initToolbar();
     }
 
