@@ -1,11 +1,11 @@
 package com.wzh.androidintercept;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
 import com.wzh.androidintercept.bean.CheckPhoneResult;
+import com.wzh.androidintercept.bean.InterceptItem;
 import com.wzh.androidintercept.bean.PhoneBean;
 import com.wzh.androidintercept.network.NetWorkUtils;
 import com.wzh.androidintercept.utils.PreferceHelper;
@@ -35,15 +36,22 @@ public class PhoneReceiver extends BroadcastReceiver {
     private static final String TAG = "PhoneReceiver";
     private Context context;
 
+    private long lastTime;
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "onReceive context=" + intent.getAction() + " intent=" + intent);
+        Log.d(TAG, "onReceive context=" + intent.getAction() + " intent=" + intent + " t=" + Thread.currentThread() + " " + this);
         this.context = context;
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             Toast.makeText(context, "开机完毕~", Toast.LENGTH_LONG).show();
         } else if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
             // 如果是去电（拨出）
-        } else {
+        } else if ("android.intent.action.PHONE_STATE".equals(intent.getAction())) {
+            if (SystemClock.uptimeMillis() - lastTime < 5000) {//5 秒内多个广播，忽略
+                return;
+            }
+            lastTime = SystemClock.uptimeMillis();
+
             Bundle bundle = intent.getExtras();
             Set<String> set = bundle.keySet();
             if (set != null) {
@@ -51,9 +59,54 @@ public class PhoneReceiver extends BroadcastReceiver {
                     Log.d(TAG, key + " : " + bundle.get(key));
                 }
             }
-            TelephonyManager tm = (TelephonyManager) context.getSystemService(Service.TELEPHONY_SERVICE);
-            // 设置一个监听器
-            tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
+            String state = bundle.getString("state");
+            final String incomingNumber = bundle.getString("incoming_number");
+            if ("RINGING".equals(state) && !TextUtils.isEmpty(incomingNumber)) {
+
+                Log.d(TAG, "开始判断="+incomingNumber);
+                boolean isEnable = new PreferceHelper<Boolean>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_INTERCEPT_ENABLE).getValue(true);
+                if (!isEnable) {
+                    showToast("拦截器已关闭");
+                    return;
+                }
+
+                final PhoneBean phoneBean = new PhoneBean(incomingNumber);
+                List<PhoneBean> whiteList = getWhiteList();
+                if (whiteList.contains(phoneBean)) {
+                    showToast("白名单号码: " + incomingNumber + " 不拦截");
+                    return;
+                }
+                List<PhoneBean> blackList = getBlackList();
+                if (blackList.contains(phoneBean)) {
+                    showToast("黑名单号码: " + incomingNumber + " 拦截");
+                    stopCall();
+
+                    phoneBean.identity = "黑名单 号码拦截";
+                    saveIntercept(phoneBean);
+                    return;
+                } else {//
+                    NetWorkUtils.checkPhoneAsync(incomingNumber, new Action1<CheckPhoneResult>() {
+                        @Override
+                        public void call(CheckPhoneResult result) {
+                            Log.d(TAG, "success:" + result);
+                            if (result != null && result.getStatus() == 1) {
+                                showToast("骚扰电话: " + incomingNumber + " 拦截");
+                                stopCall();
+
+                                phoneBean.identity = "骚扰号码 拦截";
+                                saveIntercept(phoneBean);
+                            } else {
+                                showToast("非骚扰电话: " + incomingNumber + " 不拦截");
+                            }
+                        }
+                    }, null);
+
+                }
+
+                /*TelephonyManager tm = (TelephonyManager) context.getSystemService(Service.TELEPHONY_SERVICE);
+                // 设置一个监听器
+                tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);*/
+            }
         }
     }
 
@@ -77,6 +130,12 @@ public class PhoneReceiver extends BroadcastReceiver {
                     if (TextUtils.isEmpty(incomingNumber))
                         return;
 
+                    boolean isEnable = new PreferceHelper<Boolean>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_INTERCEPT_ENABLE).getValue(true);
+                    if (!isEnable) {
+//                        showToast("拦截器已关闭");
+                        return;
+                    }
+
                     final PhoneBean phoneBean = new PhoneBean(incomingNumber);
                     List<PhoneBean> whiteList = getWhiteList();
                     if (whiteList.contains(phoneBean)) {
@@ -89,10 +148,7 @@ public class PhoneReceiver extends BroadcastReceiver {
                         stopCall();
 
                         phoneBean.identity = "黑名单 号码拦截";
-                        PreferceHelper<List<PhoneBean>> interceptList = new PreferceHelper<>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_INTERCEPT_LIST);
-                        List<PhoneBean> list = interceptList.getValue(new ArrayList<PhoneBean>());
-                        list.add(phoneBean);
-                        interceptList.saveValue(list);
+                        saveIntercept(phoneBean);
                         return;
                     } else {//
                         NetWorkUtils.checkPhoneAsync(incomingNumber, new Action1<CheckPhoneResult>() {
@@ -104,15 +160,12 @@ public class PhoneReceiver extends BroadcastReceiver {
                                     stopCall();
 
                                     phoneBean.identity = "骚扰号码 拦截";
-                                    PreferceHelper<List<PhoneBean>> interceptList = new PreferceHelper<>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_INTERCEPT_LIST);
-                                    List<PhoneBean> list = interceptList.getValue(new ArrayList<PhoneBean>());
-                                    list.add(phoneBean);
-                                    interceptList.saveValue(list);
+                                    saveIntercept(phoneBean);
                                 } else {
                                     showToast("非骚扰电话: " + incomingNumber + " 不拦截");
                                 }
                             }
-                        },null);
+                        }, null);
 
                     }
                     break;
@@ -134,8 +187,15 @@ public class PhoneReceiver extends BroadcastReceiver {
         return new PreferceHelper<List<PhoneBean>>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_BLACK_LIST).getValue(new ArrayList<PhoneBean>());
     }
 
-    private List<PhoneBean> getInterceptList() {
-        return new PreferceHelper<List<PhoneBean>>(PreferceHelper.FILE_MAIN, PreferceHelper.KEY_INTERCEPT_LIST).getValue(new ArrayList<PhoneBean>());
+    private void saveIntercept(PhoneBean phoneBean) {
+        PreferceHelper<List<InterceptItem>> interceptList = new PreferceHelper<>(PreferceHelper.FILE_RECORD, PreferceHelper.KEY_INTERCEPT_LIST);
+        List<InterceptItem> list = interceptList.getValue(new ArrayList<InterceptItem>());
+        InterceptItem item = new InterceptItem();
+        item.phone = phoneBean.phone;
+        item.identity = phoneBean.identity;
+        item.time = System.currentTimeMillis();
+        list.add(item);
+        interceptList.saveValue(list);
     }
 
     public void stopCall() {

@@ -11,11 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.wzh.androidintercept.R;
 import com.wzh.androidintercept.base.BaseRecyclerAdapter;
 import com.wzh.androidintercept.base.BaseViewHolder;
-import com.wzh.androidintercept.bean.PhoneBean;
+import com.wzh.androidintercept.bean.InterceptItem;
 import com.wzh.androidintercept.databinding.ActivityInterceptRecordBinding;
 import com.wzh.androidintercept.utils.PreferceHelper;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
@@ -28,7 +29,7 @@ import java.util.List;
 public class InterceptRecordActivity extends BaseActivity {
 
     private ActivityInterceptRecordBinding binding;
-    private PreferceHelper<List<PhoneBean>> mPreferHelper;
+    private PreferceHelper<List<InterceptItem>> mPreferHelper;
     private MyAdapter mAdapter;
 
     @Override
@@ -46,14 +47,16 @@ public class InterceptRecordActivity extends BaseActivity {
         binding.recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         mAdapter = new MyAdapter();
-        mAdapter.setData(mPreferHelper.getValue(new ArrayList<PhoneBean>()));
+        mAdapter.setData(mPreferHelper.getValue());
         binding.recycler.setAdapter(mAdapter);
     }
 
-    class MyAdapter extends BaseRecyclerAdapter<InterceptRecordActivity.MyAdapter.ViewHolder, PhoneBean> {
+    class MyAdapter extends BaseRecyclerAdapter<InterceptRecordActivity.MyAdapter.ViewHolder, InterceptItem> {
 
+        SimpleDateFormat format;
         public MyAdapter() {
-            super(R.layout.item_phone);
+            super(R.layout.item_intercept);
+            format=new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
         }
 
         @Override
@@ -63,19 +66,21 @@ public class InterceptRecordActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(@NonNull InterceptRecordActivity.MyAdapter.ViewHolder holder, int position) {
-            PhoneBean item = getItem(position);
+            InterceptItem item = getItem(position);
             holder.tvPhone.setText(item.phone);
             holder.tvIdentity.setText(item.identity);
+            holder.tvTime.setText(format.format(new Date(item.time)));
         }
 
         public class ViewHolder extends BaseViewHolder {
 
-            public TextView tvPhone,tvIdentity;
+            public TextView tvPhone,tvIdentity,tvTime;
 
             public ViewHolder(View itemView) {
                 super(itemView);
                 tvPhone = itemView.findViewById(R.id.tv_phone);
                 tvIdentity = itemView.findViewById(R.id.tv_identity);
+                tvTime = itemView.findViewById(R.id.tv_time);
 
             }
 
