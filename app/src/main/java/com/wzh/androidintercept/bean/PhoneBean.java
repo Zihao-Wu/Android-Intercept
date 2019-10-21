@@ -27,6 +27,5 @@ public class PhoneBean implements Serializable {
             return ((PhoneBean)obj).phone.equals(phone);
         }
         return false;
-
     }
 }

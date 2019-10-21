@@ -37,4 +37,14 @@ public class CheckPhoneResult {
     public void setInfo(String info) {
         this.info = info;
     }
+
+    @Override
+    public String toString() {
+        return "CheckPhoneResult{" +
+                "data='" + data + '\'' +
+                ", html='" + html + '\'' +
+                ", status=" + status +
+                ", info='" + info + '\'' +
+                '}';
+    }
 }

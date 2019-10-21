@@ -5,11 +5,14 @@
     <color name="colorAccent">#D81B60</color>
     <color name="tv_black">#070707</color>
     <color name="tv_gray">#DBDBDB</color>
+    <color name="tv_red">#ff0000</color>
     <color name="line">#dddddd</color>
     <color name="white">#ffffff</color>
     <color name="black_333333">#333333</color>
     <color name="gray_E5E5E5">#E5E5E5</color>
     <color name="black_50">#50000000</color>
+    <color name="gary_e2">#E2E2E2</color>
+
 
 
 
