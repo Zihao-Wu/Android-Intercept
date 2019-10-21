@@ -1,6 +1,7 @@
 package com.wzh.androidintercept;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -10,10 +11,14 @@ import androidx.navigation.ui.AppBarConfiguration;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.wzh.androidintercept.bean.CheckPhoneResult;
+import com.wzh.androidintercept.network.NetWorkUtils;
+
+import rx.functions.Action1;
 
 public class MainActivity extends AppCompatActivity {
 
-    private AppBarConfiguration mAppBarConfiguration;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +32,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "感谢您的点赞！", Snackbar.LENGTH_SHORT)
                         .setAction("Action", null).show();
+
+                NetWorkUtils.checkPhoneAsync("17151129141", new Action1<CheckPhoneResult>() {
+                    @Override
+                    public void call(CheckPhoneResult result) {
+                        Log.d(TAG,"success:"+result);
+
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.d(TAG,"error :"+throwable);
+                    }
+                });
             }
         });
 

@@ -1,13 +1,22 @@
 package com.wzh.androidintercept.ui;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.wzh.androidintercept.R;
+import com.wzh.androidintercept.base.BaseRecyclerAdapter;
+import com.wzh.androidintercept.base.BaseViewHolder;
+import com.wzh.androidintercept.bean.PhoneBean;
 import com.wzh.androidintercept.databinding.ActivityInterceptRecordBinding;
 import com.wzh.androidintercept.utils.PreferceHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -19,77 +28,57 @@ import com.wzh.androidintercept.utils.PreferceHelper;
 public class InterceptRecordActivity extends BaseActivity {
 
     private ActivityInterceptRecordBinding binding;
-    private PreferceHelper<Object> mPreferHelper;
-//    private MyAdapter mAdapter;
+    private PreferceHelper<List<PhoneBean>> mPreferHelper;
+    private MyAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding=DataBindingUtil.setContentView(this,R.layout.activity_intercept_record);
+
         initView();
     }
 
     private void initView() {
         setTitle("拦截记录");
-        mPreferHelper = new PreferceHelper<>(PreferceHelper.FILE_RECORD,PreferceHelper.KEY_LIST);
+        mPreferHelper = new PreferceHelper<>(PreferceHelper.FILE_RECORD,PreferceHelper.KEY_INTERCEPT_LIST);
 
         binding.recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-//        mAdapter = new MyAdapter();
-//        mAdapter.setData(mPreferHelper.getValue(new ArrayList<PhoneBean>()));
-//        binding.recycler.setAdapter(mAdapter);
+        mAdapter = new MyAdapter();
+        mAdapter.setData(mPreferHelper.getValue(new ArrayList<PhoneBean>()));
+        binding.recycler.setAdapter(mAdapter);
     }
 
-/*
-    class MyAdapter extends BaseRecyclerAdapter<PhoneListActivity.MyAdapter.ViewHolder, PhoneBean> {
+    class MyAdapter extends BaseRecyclerAdapter<InterceptRecordActivity.MyAdapter.ViewHolder, PhoneBean> {
 
         public MyAdapter() {
             super(R.layout.item_phone);
         }
 
         @Override
-        public PhoneListActivity.MyAdapter.ViewHolder createViewHolder(View itemView, int viewType) {
-            return new PhoneListActivity.MyAdapter.ViewHolder(itemView);
+        public InterceptRecordActivity.MyAdapter.ViewHolder createViewHolder(View itemView, int viewType) {
+            return new InterceptRecordActivity.MyAdapter.ViewHolder(itemView);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull PhoneListActivity.MyAdapter.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull InterceptRecordActivity.MyAdapter.ViewHolder holder, int position) {
             PhoneBean item = getItem(position);
             holder.tvPhone.setText(item.phone);
+            holder.tvIdentity.setText(item.identity);
         }
 
         public class ViewHolder extends BaseViewHolder {
 
-            public TextView tvPhone;
+            public TextView tvPhone,tvIdentity;
 
             public ViewHolder(View itemView) {
                 super(itemView);
                 tvPhone = itemView.findViewById(R.id.tv_phone);
-                itemView.findViewById(R.id.tv_delete).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showDeleteDialog();
-                    }
-                });
+                tvIdentity = itemView.findViewById(R.id.tv_identity);
+
             }
 
-            private void showDeleteDialog(){
-                new AlertDialog.Builder(PhoneListActivity.this)
-                        .setTitle("确定删除吗？")
-                        .setNegativeButton("取消", null)
-                        .setPositiveButton("删除", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                int position = getAdapterPosition();
-                                PhoneBean item = getItem(position);
-                                mAdapter.getListData().remove(item);
-                                mAdapter.notifyItemRemoved(position);
-
-                                mPreferHelper.saveValue(mAdapter.getListData());
-                            }
-                        }).show();
-            }
         }
-    }*/
+    }
 }

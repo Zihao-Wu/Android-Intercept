@@ -29,7 +29,7 @@ public class PreferceHelper<T> {
     public static final String KEY_INTERCEPT_ENABLE = "intercept_enable";//是否拦截
     public static final String KEY_BLACK_LIST = "blackList";//黑名单
     public static final String KEY_WHITE_LIST = "whiteList";//白名单
-    public static final String KEY_LIST = "list";//拦截记录
+    public static final String KEY_INTERCEPT_LIST = "interceptList";//拦截记录
 
     private static Context ctx;
 

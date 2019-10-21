@@ -36,9 +36,9 @@ public class NetWorkUtils {
 
     static {
         sClient = new OkHttpClient.Builder()
-                .connectTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .writeTimeout(5, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
                 .build();
         sGson = new Gson();
     }
@@ -52,18 +52,26 @@ public class NetWorkUtils {
 
     /**
      * 获取手机号状态，同步
+     *
      * @param phone
      * @return
      */
-    public CheckPhoneResult checkPhoneSync(String phone) {
+    public static CheckPhoneResult checkPhoneSync(String phone) {
         if (TextUtils.isEmpty(phone))
             return null;
 
         Request request = new Request.Builder().url(CHECK_URL)
-                .post(new FormBody.Builder().add("phone", phone).build()).build();
+                .post(new FormBody.Builder()
+                        .add("phone", phone)
+                        .build())
+                //更改为浏览器标识，否则403
+                .header("user-agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36")
+                .build();
         try {
             long start = SystemClock.uptimeMillis();
             Response response = sClient.newCall(request).execute();
+            Log.d(TAG, "time:" + (SystemClock.uptimeMillis() - start) + "ms body:" + response.code() + " r=" + response);
+
             if (response.isSuccessful()) {
                 String body = response.body().string();
                 Log.d(TAG, "time:" + (SystemClock.uptimeMillis() - start) + "ms body:" + body);
@@ -72,17 +80,19 @@ public class NetWorkUtils {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return null;
     }
 
     /**
      * 获取手机号状态，异步
+     *
      * @param phone
      * @param onSuccess
      * @param error
      */
-    public void checkPhoneAsync(String phone, Action1<CheckPhoneResult> onSuccess, Action1<Throwable> error) {
+    public static void checkPhoneAsync(String phone, Action1<CheckPhoneResult> onSuccess, Action1<Throwable> error) {
         if (phone == null || onSuccess == null)
             throw new NullPointerException("phone == null or onSuccess==null");
         Single<CheckPhoneResult> single = Single.just(phone).map(new Func1<String, CheckPhoneResult>() {
