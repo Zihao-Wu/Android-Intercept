@@ -16,6 +16,8 @@ import com.wzh.androidintercept.R;
 import com.wzh.androidintercept.base.BaseRecyclerAdapter;
 import com.wzh.androidintercept.base.BaseViewHolder;
 import com.wzh.androidintercept.bean.PhoneMappingItem;
+import com.wzh.androidintercept.common.CommonDialog;
+import com.wzh.androidintercept.common.CommonItemDecoration;
 import com.wzh.androidintercept.databinding.ActivityPhoneMappingBinding;
 import com.wzh.androidintercept.utils.PreferceHelper;
 
@@ -32,7 +34,7 @@ public class PhoneMappingActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_phone_mapping);
-
+        setTitle("号码映射");
         mPreferHelper = new PreferceHelper<>(PreferceHelper.FILE_MAPPING, PreferceHelper.KEY_MAPPING_LIST);
 
         initListener();
@@ -40,6 +42,7 @@ public class PhoneMappingActivity extends BaseActivity {
         mAdapter = new MyAdapter();
         mAdapter.setData(mPreferHelper.getValue(new ArrayList<PhoneMappingItem>()));
         binding.recyclerView.setAdapter(mAdapter);
+        binding.recyclerView.addItemDecoration(new CommonItemDecoration(this, R.drawable.divider_shape));
     }
 
     private void initListener() {
@@ -103,6 +106,27 @@ public class PhoneMappingActivity extends BaseActivity {
         @Override
         public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, int position) {
             PhoneMappingItem item = getItem(position);
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    new CommonDialog.Builder(PhoneMappingActivity.this)
+                            .setContent("是否删除映射记录？")
+                            .setCancel("取消")
+                            .setConfirm("确认", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    List<PhoneMappingItem> mappingItems = mAdapter.getListData();
+                                    mAdapter.notifyItemRemoved(position);
+                                    mappingItems.remove(position);
+                                    mPreferHelper.saveValue(mappingItems);
+//                                    binding.recyclerView.smoothScrollToPosition(0);
+                                }
+                            })
+                            .create()
+                            .show();
+                    return false;
+                }
+            });
             holder.originalTv.setText(item.getOriginPhone());
             holder.mappingTv.setText(item.getMappingPhone());
         }
@@ -115,7 +139,6 @@ public class PhoneMappingActivity extends BaseActivity {
                 super(itemView);
                 originalTv = itemView.findViewById(R.id.original_tv);
                 mappingTv = itemView.findViewById(R.id.mapping_tv);
-
             }
         }
     }

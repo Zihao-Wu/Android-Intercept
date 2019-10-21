@@ -8,21 +8,30 @@
     <TextView
         android:id="@+id/original_tv"
         android:layout_width="0px"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
+        android:padding="20dp"
+        android:textColor="@color/tv_black"
+        android:textSize="14sp"
         tools:text="15692113619" />
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:text="---->" />
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:text="---->"
+        android:textColor="@color/tv_black"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/mapping_tv"
         android:layout_width="0px"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
+        android:padding="20dp"
+        android:textColor="@color/tv_black"
+        android:textSize="14sp"
         tools:text="17600001111" />
 </LinearLayout>
