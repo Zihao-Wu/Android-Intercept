@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 
@@ -16,7 +17,6 @@ import com.wzh.androidintercept.R;
 import com.wzh.androidintercept.base.BaseRecyclerAdapter;
 import com.wzh.androidintercept.base.BaseViewHolder;
 import com.wzh.androidintercept.bean.PhoneMappingItem;
-import com.wzh.androidintercept.common.CommonDialog;
 import com.wzh.androidintercept.common.CommonItemDecoration;
 import com.wzh.androidintercept.databinding.ActivityPhoneMappingBinding;
 import com.wzh.androidintercept.utils.PreferceHelper;
@@ -46,9 +46,20 @@ public class PhoneMappingActivity extends BaseActivity {
     }
 
     private void initListener() {
+        binding.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initDialog("", "").show();
+            }
+        });
+    }
+
+    private AlertDialog initDialog(@Nullable String originPhoneStr, @Nullable String mappingPhoneStr) {
         final View view = getLayoutInflater().inflate(R.layout.add_mapping_phone_layout, null);
         final EditText originPhone = view.findViewById(R.id.origin_ed_phone);
         final EditText mappingPhone = view.findViewById(R.id.mapping_ed_phone);
+        originPhone.setText(TextUtils.isEmpty(originPhoneStr) ? "" : originPhoneStr);
+        mappingPhone.setText(TextUtils.isEmpty(mappingPhoneStr) ? "" : mappingPhoneStr);
         final AlertDialog dialog = new AlertDialog.Builder(PhoneMappingActivity.this)
                 .setTitle("映射号码添加")
                 .setView(view).setNegativeButton("取消", null)
@@ -68,7 +79,7 @@ public class PhoneMappingActivity extends BaseActivity {
                             Toast.makeText(PhoneMappingActivity.this, "原始电话号码太短哦~", Toast.LENGTH_SHORT).show();
                             return;
                         } else if (mappingStr.length() < 3) {
-                            Toast.makeText(PhoneMappingActivity.this, "原始电话号码太短哦~", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PhoneMappingActivity.this, "映射电话号码太短哦~", Toast.LENGTH_SHORT).show();
                             return;
                         }
                         List<PhoneMappingItem> list = mAdapter.getListData();
@@ -78,21 +89,12 @@ public class PhoneMappingActivity extends BaseActivity {
                             mPreferHelper.saveValue(list);
                             mAdapter.notifyItemInserted(0);
                             binding.recyclerView.smoothScrollToPosition(0);
-                        }else{
+                        } else {
                             Toast.makeText(PhoneMappingActivity.this, "原始电话号码已存在哦~", Toast.LENGTH_SHORT).show();
-                            return;
                         }
                     }
                 }).create();
-
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                originPhone.setText("");
-                mappingPhone.setText("");
-                dialog.show();
-            }
-        });
+        return dialog;
     }
 
     class MyAdapter extends BaseRecyclerAdapter<MyAdapter.ViewHolder, PhoneMappingItem> {
@@ -107,27 +109,31 @@ public class PhoneMappingActivity extends BaseActivity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder,final int position) {
+        public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, final int position) {
             PhoneMappingItem item = getItem(position);
             holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    new CommonDialog.Builder(PhoneMappingActivity.this)
-                            .setContent("是否删除映射记录？")
-                            .setCancel("取消")
-                            .setConfirm("确认", new View.OnClickListener() {
+                    new AlertDialog.Builder(PhoneMappingActivity.this)
+                            .setTitle("是否删除映射记录？")
+                            .setNegativeButton("取消", null)
+                            .setPositiveButton("确认", new DialogInterface.OnClickListener() {
                                 @Override
-                                public void onClick(View v) {
+                                public void onClick(DialogInterface dialog, int which) {
                                     List<PhoneMappingItem> mappingItems = mAdapter.getListData();
                                     mAdapter.notifyItemRemoved(position);
                                     mappingItems.remove(position);
                                     mPreferHelper.saveValue(mappingItems);
-//                                    binding.recyclerView.smoothScrollToPosition(0);
                                 }
-                            })
-                            .create()
-                            .show();
+                            }).create().show();
                     return false;
+                }
+            });
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    initDialog(item.getOriginPhone(), item.getMappingPhone()).show();
                 }
             });
             holder.originalTv.setText(item.getOriginPhone());

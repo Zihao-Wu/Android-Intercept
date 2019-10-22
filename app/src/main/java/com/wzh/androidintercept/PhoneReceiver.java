@@ -16,6 +16,7 @@ import com.android.internal.telephony.ITelephony;
 import com.wzh.androidintercept.bean.CheckPhoneResult;
 import com.wzh.androidintercept.bean.InterceptItem;
 import com.wzh.androidintercept.bean.PhoneBean;
+import com.wzh.androidintercept.bean.PhoneLocationResult;
 import com.wzh.androidintercept.bean.PhoneMappingItem;
 import com.wzh.androidintercept.network.NetWorkUtils;
 import com.wzh.androidintercept.utils.PreferceHelper;
@@ -74,31 +75,31 @@ public class PhoneReceiver extends BroadcastReceiver {
     }
 
     private void intercept(String origPhone) {
-        Log.d(TAG, "开始判断="+origPhone);
+        Log.d(TAG, "开始判断=" + origPhone);
         boolean isEnable = isEnableIntercept();
         if (!isEnable) {
             showToast("拦截器已关闭");
             return;
         }
 
-        List<PhoneMappingItem> mapps=getMappingList();
-        for(PhoneMappingItem item:mapps){
-            if(item.equals(origPhone)){//映射
-                origPhone=item.getMappingPhone();
+        List<PhoneMappingItem> mapps = getMappingList();
+        for (PhoneMappingItem item : mapps) {
+            if (item.equals(origPhone)) {//映射
+                origPhone = item.getMappingPhone();
             }
         }
         final PhoneBean phoneBean = new PhoneBean(origPhone);
         List<PhoneBean> whiteList = getWhiteList();
         if (whiteList.contains(phoneBean)) {
             showToast("白名单号码: " + origPhone + " 不拦截");
-        }else if (getBlackList().contains(phoneBean)) {
+        } else if (getBlackList().contains(phoneBean)) {
             showToast("黑名单号码: " + origPhone + " 拦截");
             stopCall();
 
             phoneBean.identity = "黑名单 号码拦截";
-            saveIntercept(phoneBean);
+            getPhoneLocation(phoneBean);
         } else {//
-            final String phone=origPhone;
+            final String phone = origPhone;
             NetWorkUtils.checkPhoneAsync(phone, new Action1<CheckPhoneResult>() {
                 @Override
                 public void call(CheckPhoneResult result) {
@@ -108,7 +109,7 @@ public class PhoneReceiver extends BroadcastReceiver {
                         stopCall();
 
                         phoneBean.identity = "骚扰号码 拦截";
-                        saveIntercept(phoneBean);
+                        getPhoneLocation(phoneBean);
                     } else {
                         showToast("非骚扰电话: " + phone + " 不拦截");
                     }
@@ -166,14 +167,42 @@ public class PhoneReceiver extends BroadcastReceiver {
         return new PreferceHelper<List<PhoneMappingItem>>(PreferceHelper.FILE_MAPPING, PreferceHelper.KEY_MAPPING_LIST).getValue(new ArrayList<PhoneMappingItem>());
     }
 
+    private void getPhoneLocation(PhoneBean phoneBean) {
+        NetWorkUtils.getPhoneLocation(phoneBean.phone, new Action1<PhoneLocationResult>() {
+            @Override
+            public void call(PhoneLocationResult result) {
+                if (result != null) {
+                    PhoneLocationResult.ResultBean resultBean = result.getResult();
+                    if (resultBean != null) {
+                        if (resultBean.getProvince().equals(resultBean.getCity())) {
+                            phoneBean.location = resultBean.getProvince();
+                        } else {
+                            phoneBean.location = resultBean.getProvince() + "-" + resultBean.getCity();
+                        }
+                        if (!TextUtils.isEmpty(resultBean.getCompany())) {
+                            phoneBean.location += " - " + resultBean.getCompany();
+                        }
+                    }
+                }
+                saveIntercept(phoneBean);
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                saveIntercept(phoneBean);
+            }
+        });
+    }
+
     private void saveIntercept(PhoneBean phoneBean) {
         PreferceHelper<List<InterceptItem>> interceptList = new PreferceHelper<>(PreferceHelper.FILE_RECORD, PreferceHelper.KEY_INTERCEPT_LIST);
-        List<InterceptItem> list = interceptList.getValue(new ArrayList<InterceptItem>());
+        List<InterceptItem> list = interceptList.getValue(new ArrayList<>());
         InterceptItem item = new InterceptItem();
         item.phone = phoneBean.phone;
         item.identity = phoneBean.identity;
+        item.location = phoneBean.location;
         item.time = System.currentTimeMillis();
-        list.add(0,item);
+        list.add(0, item);
         interceptList.saveValue(list);
     }
 

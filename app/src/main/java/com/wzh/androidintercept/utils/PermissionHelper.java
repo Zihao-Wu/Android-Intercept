@@ -2,15 +2,13 @@ package com.wzh.androidintercept.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.text.TextUtils;
-import android.view.View;
+import android.content.DialogInterface;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
-import com.wzh.androidintercept.common.CommonDialog;
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
 import com.yanzhenjie.permission.runtime.PermissionDef;
 
 import java.util.List;
@@ -28,7 +26,7 @@ public class PermissionHelper {
         this.mContext = mContext;
     }
 
-    public void requestPermission(Action<List<String>> granted, PermissionDeniedCallBack permissionDeniedCallBack, @PermissionDef String... permissionList) {
+    public void requestPermission(Action<List<String>> granted, PermissionDeniedCallBack permissionDeniedCallBack, int reqCode, String permissionNames, @PermissionDef String... permissionList) {
         AndPermission.with(mContext)
                 .runtime()
                 .permission(permissionList)
@@ -39,7 +37,7 @@ public class PermissionHelper {
                         if (AndPermission.hasAlwaysDeniedPermission(mContext, permissions)) {
                             if (permissionDeniedCallBack != null) {
                                 if (!permissionDeniedCallBack.onRefuse()) {
-                                    showSettingDialog(mContext,0, true,permissions);
+                                    showSettingDialog(mContext, reqCode, true, permissionNames, permissions);
                                 }
                             }
                         } else {
@@ -52,22 +50,28 @@ public class PermissionHelper {
                 .start();
     }
 
-    private void showSettingDialog(Context context, @Nullable int reqCode, boolean exitApp, final List<String> permissionList) {
-        String content = "请在设置中授予以下权限:\n" + TextUtils.join("\n", permissionList);
+    private void showSettingDialog(Context context, @Nullable int reqCode, boolean exitApp, String permissionNames, final List<String> permissionList) {
+//        List<String> permissionNames = Permission.transformText(context, permissionList);
+        String content = "请在设置中授予以下权限:\n" + permissionNames;
 
-        new CommonDialog.Builder(context)
-                .setContent(content)
-                .setCancel("拒绝", new View.OnClickListener() {
+        final AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle(content)
+                .setCancelable(false)
+                .setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(DialogInterface dialog, int which) {
                         if (exitApp) {
                             ((Activity) context).finish();
                         }
                     }
                 })
-                .setConfirm("前往设置", v -> {
-                    goSetting(reqCode);
-                }).create().show();
+                .setPositiveButton("前往设置", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        goSetting(reqCode);
+                    }
+                }).create();
+        dialog.show();
     }
 
     public interface PermissionDeniedCallBack {
@@ -80,5 +84,25 @@ public class PermissionHelper {
         AndPermission.with(mContext)
                 .runtime()
                 .setting().start(reqCode);
+    }
+
+    public boolean checkPermission(@PermissionDef String... permissionList) {
+        final boolean[] hasPermission = new boolean[1];
+        AndPermission.with(mContext)
+                .runtime()
+                .permission(permissionList)
+                .onDenied(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                        hasPermission[0] = false;
+                    }
+                })
+                .onGranted(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                        hasPermission[0] = true;
+                    }
+                });
+        return hasPermission[0];
     }
 }

@@ -13,5 +13,6 @@ public class InterceptItem implements Serializable {
     public String phone;
     public String identity;//身份标识
     public long time;//发生时间
+    public String location;//归属地
 
 }

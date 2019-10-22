@@ -70,16 +70,18 @@ public class InterceptRecordActivity extends BaseActivity {
             InterceptItem item = getItem(position);
             holder.tvPhone.setText(item.phone);
             holder.tvIdentity.setText(item.identity);
+            holder.tvLocation.setText(item.location);
             holder.tvTime.setText(format.format(new Date(item.time)));
         }
 
         public class ViewHolder extends BaseViewHolder {
 
-            public TextView tvPhone,tvIdentity,tvTime;
+            public TextView tvPhone,tvLocation,tvIdentity,tvTime;
 
             public ViewHolder(View itemView) {
                 super(itemView);
                 tvPhone = itemView.findViewById(R.id.tv_phone);
+                tvLocation = itemView.findViewById(R.id.tv_location);
                 tvIdentity = itemView.findViewById(R.id.tv_identity);
                 tvTime = itemView.findViewById(R.id.tv_time);
 
