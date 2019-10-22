@@ -49,21 +49,22 @@ public class PhoneMappingActivity extends BaseActivity {
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                initDialog("", "").show();
+                initDialog(1, "", "", 1).show();
             }
         });
     }
 
-    private AlertDialog initDialog(@Nullable String originPhoneStr, @Nullable String mappingPhoneStr) {
+    private AlertDialog initDialog(int type, @Nullable String originPhoneStr, @Nullable String mappingPhoneStr, int position) {
         final View view = getLayoutInflater().inflate(R.layout.add_mapping_phone_layout, null);
         final EditText originPhone = view.findViewById(R.id.origin_ed_phone);
         final EditText mappingPhone = view.findViewById(R.id.mapping_ed_phone);
         originPhone.setText(TextUtils.isEmpty(originPhoneStr) ? "" : originPhoneStr);
         mappingPhone.setText(TextUtils.isEmpty(mappingPhoneStr) ? "" : mappingPhoneStr);
+
         final AlertDialog dialog = new AlertDialog.Builder(PhoneMappingActivity.this)
-                .setTitle("映射号码添加")
+                .setTitle(type == 1 ? "映射号码添加" : "映射号码修改")
                 .setView(view).setNegativeButton("取消", null)
-                .setPositiveButton("确定添加", new DialogInterface.OnClickListener() {
+                .setPositiveButton(type == 1 ? "确定添加" : "确定修改", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String originStr = originPhone.getText().toString().trim();
@@ -85,10 +86,17 @@ public class PhoneMappingActivity extends BaseActivity {
                         List<PhoneMappingItem> list = mAdapter.getListData();
                         PhoneMappingItem bean = new PhoneMappingItem(originStr, mappingStr);
                         if (!list.contains(bean)) {
-                            list.add(0, bean);
-                            mPreferHelper.saveValue(list);
-                            mAdapter.notifyItemInserted(0);
-                            binding.recyclerView.smoothScrollToPosition(0);
+                            if (type == 1) {  //添加
+                                list.add(0, bean);
+                                mPreferHelper.saveValue(list);
+                                mAdapter.notifyItemInserted(0);
+                                binding.recyclerView.smoothScrollToPosition(0);
+                            } else if (type == 2) {  //修改
+                                list.remove(position);
+                                list.add(position, bean);
+                                mPreferHelper.saveValue(list);
+                                mAdapter.notifyItemChanged(position);
+                            }
                         } else {
                             Toast.makeText(PhoneMappingActivity.this, "原始电话号码已存在哦~", Toast.LENGTH_SHORT).show();
                         }
@@ -133,7 +141,7 @@ public class PhoneMappingActivity extends BaseActivity {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    initDialog(item.getOriginPhone(), item.getMappingPhone()).show();
+                    initDialog(2, item.getOriginPhone(), item.getMappingPhone(), position).show();
                 }
             });
             holder.originalTv.setText(item.getOriginPhone());
