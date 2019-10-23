@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.PhoneMappingActivity"></activity>
+        <activity android:name=".ui.CallRecordActivity"></activity>
+        <activity android:name=".ui.PhoneMappingActivity" />
         <activity
             android:name=".ui.InterceptRecordActivity"
             android:launchMode="singleTop" />

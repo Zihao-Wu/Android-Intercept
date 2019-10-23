@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import com.wzh.androidintercept.R;
 import com.wzh.androidintercept.databinding.FragmentHomeBinding;
+import com.wzh.androidintercept.ui.CallRecordActivity;
 import com.wzh.androidintercept.ui.InterceptRecordActivity;
 import com.wzh.androidintercept.ui.PhoneListActivity;
 import com.wzh.androidintercept.ui.PhoneMappingActivity;
@@ -69,6 +70,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.tv_mapping:
                 intent = new Intent(getContext(), PhoneMappingActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.tv_call_record:
+                intent = new Intent(getContext(), CallRecordActivity.class);
                 startActivity(intent);
                 break;
             case R.id.tv_record:
