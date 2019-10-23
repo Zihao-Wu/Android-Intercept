@@ -26,12 +26,14 @@ public class PreferceHelper<T> {
     public static final String FILE_MAIN = "app_main";//
     public static final String FILE_RECORD = "record";//拦截记录
     public static final String FILE_MAPPING = "mapping";//拦截记录
+    public static final String FILE_QUERY = "query";//号码查询
 
     public static final String KEY_INTERCEPT_ENABLE = "intercept_enable";//是否拦截
     public static final String KEY_BLACK_LIST = "blackList";//黑名单
     public static final String KEY_WHITE_LIST = "whiteList";//白名单
     public static final String KEY_INTERCEPT_LIST = "interceptList";//拦截记录
     public static final String KEY_MAPPING_LIST = "mappingList";//号码映射
+    public static final String KEY_QUERY_RECORD = "queryRecordList";//查询记录
 
     private static Context ctx;
 

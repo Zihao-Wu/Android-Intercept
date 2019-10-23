@@ -33,7 +33,7 @@
         android:background="@drawable/bg_shape"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/tv_phone"
-        android:text="删除"/>
+        android:text="移除"/>
 
     <View
         android:layout_width="match_parent"

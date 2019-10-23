@@ -140,6 +140,21 @@
             android:textColor="@color/tv_black"
             android:textSize="14sp" />
 
+        <TextView
+            android:id="@+id/tv_query"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableLeft="@drawable/ic_icon_call_reccord"
+            android:drawableRight="@mipmap/arrow_right"
+            android:drawablePadding="5dp"
+            android:onClick="@{click}"
+            android:visibility="gone"
+            android:padding="20dp"
+            android:text="号码查询"
+            android:textColor="@color/tv_black"
+            android:textSize="14sp" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"

@@ -96,7 +96,7 @@ public class PhoneReceiver extends BroadcastReceiver {
             showToast("黑名单号码: " + origPhone + " 拦截");
             stopCall();
 
-            phoneBean.identity = "黑名单 号码拦截";
+            phoneBean.identity = "黑名单号码 拦截";
             getPhoneLocation(phoneBean);
         } else {//
             final String phone = origPhone;
@@ -105,10 +105,14 @@ public class PhoneReceiver extends BroadcastReceiver {
                 public void call(CheckPhoneResult result) {
                     Log.d(TAG, "success:" + result);
                     if (result != null && result.getStatus() == 1) {
-                        showToast("骚扰电话: " + phone + " 拦截");
+                        String identity="骚扰电话";
+                        if(!TextUtils.isEmpty(result.getData()) && result.getData().contains(" ")){
+                            identity=result.getData().substring(result.getData().indexOf(" ")+1);
+                        }
+                        showToast(identity+": " + phone + " 拦截");
                         stopCall();
 
-                        phoneBean.identity = "骚扰号码 拦截";
+                        phoneBean.identity = identity+" 拦截";
                         getPhoneLocation(phoneBean);
                     } else {
                         showToast("非骚扰电话: " + phone + " 不拦截");
@@ -167,7 +171,7 @@ public class PhoneReceiver extends BroadcastReceiver {
         return new PreferceHelper<List<PhoneMappingItem>>(PreferceHelper.FILE_MAPPING, PreferceHelper.KEY_MAPPING_LIST).getValue(new ArrayList<PhoneMappingItem>());
     }
 
-    private void getPhoneLocation(PhoneBean phoneBean) {
+    private void getPhoneLocation(final PhoneBean phoneBean) {
         NetWorkUtils.getPhoneLocation(phoneBean.phone, new Action1<PhoneLocationResult>() {
             @Override
             public void call(PhoneLocationResult result) {
@@ -196,7 +200,7 @@ public class PhoneReceiver extends BroadcastReceiver {
 
     private void saveIntercept(PhoneBean phoneBean) {
         PreferceHelper<List<InterceptItem>> interceptList = new PreferceHelper<>(PreferceHelper.FILE_RECORD, PreferceHelper.KEY_INTERCEPT_LIST);
-        List<InterceptItem> list = interceptList.getValue(new ArrayList<>());
+        List<InterceptItem> list = interceptList.getValue(new ArrayList<InterceptItem>());
         InterceptItem item = new InterceptItem();
         item.phone = phoneBean.phone;
         item.identity = phoneBean.identity;

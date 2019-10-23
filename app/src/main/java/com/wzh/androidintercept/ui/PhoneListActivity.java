@@ -138,9 +138,9 @@ public class PhoneListActivity extends BaseActivity {
 
             private void showDeleteDialog(){
                 new AlertDialog.Builder(PhoneListActivity.this)
-                        .setTitle("确定删除吗？")
+                        .setTitle("确定从"+(isBlackList ? "黑" : "白") + "名单中移除吗？")
                         .setNegativeButton("取消", null)
-                        .setPositiveButton("删除", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("移除", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 

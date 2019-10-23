@@ -101,6 +101,9 @@ public class CallRecordActivity extends BaseActivity {
         return list;
     }
 
+    private void showToast(String s) {
+        Toast.makeText(CallRecordActivity.this, s, Toast.LENGTH_SHORT).show();
+    }
 
     class MyAdapter extends BaseRecyclerAdapter<MyAdapter.ViewHolder, Map<String, String>> {
 
@@ -130,7 +133,7 @@ public class CallRecordActivity extends BaseActivity {
                 case CallLog.Calls.MISSED_TYPE:
                     //"未接"
                     holder.typeIv.setImageDrawable(getResources().getDrawable(R.drawable.ic_icon_call_fail));
-                    holder.phoneTv.setTextColor(getResources().getColor(R.color.tv_red));
+                    holder.phoneTv.setTextColor(getResources().getColor(R.color.tv_red2));
                     break;
                 default:
                     break;
@@ -156,8 +159,9 @@ public class CallRecordActivity extends BaseActivity {
                         if (!phoneBeanList.contains(bean)) {
                             phoneBeanList.add(0, bean);
                             mPreferHelper.saveValue(phoneBeanList);
+                            showToast("添加成功");
                         } else {
-                            Toast.makeText(CallRecordActivity.this, "白名单该号码已存在哦~", Toast.LENGTH_SHORT).show();
+                            showToast("白名单该号码已存在哦~");
                         }
                         alertDialog.dismiss();
                     });
@@ -168,14 +172,16 @@ public class CallRecordActivity extends BaseActivity {
                         if (!phoneBeanList.contains(bean)) {
                             phoneBeanList.add(0, bean);
                             mPreferHelper.saveValue(phoneBeanList);
+                            showToast("添加成功");
                         } else {
-                            Toast.makeText(CallRecordActivity.this, "黑名单该号码已存在哦~", Toast.LENGTH_SHORT).show();
+                            showToast("黑名单该号码已存在哦~");
                         }
                         alertDialog.dismiss();
                     });
                 }
             });
         }
+
 
         public class ViewHolder extends BaseViewHolder {
 

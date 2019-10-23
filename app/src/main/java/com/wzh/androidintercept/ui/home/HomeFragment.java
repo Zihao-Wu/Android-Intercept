@@ -17,6 +17,7 @@ import com.wzh.androidintercept.ui.CallRecordActivity;
 import com.wzh.androidintercept.ui.InterceptRecordActivity;
 import com.wzh.androidintercept.ui.PhoneListActivity;
 import com.wzh.androidintercept.ui.PhoneMappingActivity;
+import com.wzh.androidintercept.ui.QueryPhoneActivity;
 import com.wzh.androidintercept.utils.PreferceHelper;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
@@ -79,6 +80,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             case R.id.tv_record:
                 intent = new Intent(getContext(), InterceptRecordActivity.class);
                 intent.putExtra(PhoneListActivity.IS_BLACK, false);
+                startActivity(intent);
+                break;
+            case R.id.tv_query:
+                intent = new Intent(getContext(), QueryPhoneActivity.class);
                 startActivity(intent);
                 break;
             default:

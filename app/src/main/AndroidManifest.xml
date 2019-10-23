@@ -2,11 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.wzh.androidintercept">
 
-    <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />
-
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -15,13 +10,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.CallRecordActivity"></activity>
-        <activity android:name=".ui.PhoneMappingActivity" />
+        <activity
+            android:name=".ui.CallRecordActivity"
+            android:launchMode="singleTop"></activity>
+        <activity
+            android:name=".ui.PhoneMappingActivity"
+            android:launchMode="singleTop" />
         <activity
             android:name=".ui.InterceptRecordActivity"
             android:launchMode="singleTop" />
         <activity
             android:name=".ui.PhoneListActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".ui.QueryPhoneActivity"
             android:launchMode="singleTop" />
         <activity
             android:name=".MainActivity"
@@ -45,5 +47,11 @@
             </intent-filter>
         </receiver>
     </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
 </manifest>
