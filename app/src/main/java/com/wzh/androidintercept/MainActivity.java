@@ -2,7 +2,6 @@ package com.wzh.androidintercept;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -67,13 +66,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 0, "电话和通话记录", PHONE);
     }
-
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
