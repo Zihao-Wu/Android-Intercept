@@ -35,12 +35,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.app_main_layout);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
+        final FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "感谢您的点赞！", Snackbar.LENGTH_SHORT)
                         .setAction("Action", null).show();
+                fab.setImageResource(R.drawable.ic_favorite2);
             }
         });
 
