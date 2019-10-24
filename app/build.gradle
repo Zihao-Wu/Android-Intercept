@@ -12,6 +12,22 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary true
     }
+
+    signingConfigs {
+        release {
+            keyAlias 'bidding_hall'
+            keyPassword '51auto'
+            storeFile file('bidding_hall.jks')
+            storePassword '51auto'
+        }
+
+        debug {
+            keyAlias 'bidding_hall'
+            keyPassword '51auto'
+            storeFile file('bidding_hall.jks')
+            storePassword '51auto'
+        }
+    }
     dataBinding {
         enabled true
     }
@@ -23,8 +39,25 @@ android {
 
     buildTypes {
         release {
+            //混淆
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            //Zipalign优化
+            zipAlignEnabled false
+            // 移除无用的resource文件
+            shrinkResources false
+            debuggable false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            debuggable true
+            signingConfig signingConfigs.release
+            multiDexKeepProguard file('multidexConfig.pro')
+
+            jniDebuggable true
         }
     }
 }
