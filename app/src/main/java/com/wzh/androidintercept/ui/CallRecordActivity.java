@@ -68,7 +68,7 @@ public class CallRecordActivity extends BaseActivity {
     }
 
     private List<Map<String, String>> getCallRecordList() {
-        SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd");
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm");
         //1.获取ContentResolver
         resolver = getContentResolver();
         //2.利用ContentResolver的query方法查询通话记录数据库
@@ -135,6 +135,11 @@ public class CallRecordActivity extends BaseActivity {
                     holder.typeIv.setImageDrawable(getResources().getDrawable(R.drawable.ic_icon_call_fail));
                     holder.phoneTv.setTextColor(getResources().getColor(R.color.tv_red2));
                     break;
+                case CallLog.Calls.REJECTED_TYPE:
+                    //"拒接"
+                    holder.typeIv.setImageDrawable(getResources().getDrawable(R.drawable.ic_icon_call_rejected));
+                    holder.phoneTv.setTextColor(getResources().getColor(R.color.tv_red2));
+                    break;
                 default:
                     break;
             }
@@ -159,7 +164,7 @@ public class CallRecordActivity extends BaseActivity {
                         if (!phoneBeanList.contains(bean)) {
                             phoneBeanList.add(0, bean);
                             mPreferHelper.saveValue(phoneBeanList);
-                            showToast("添加成功");
+                            showToast("白名单添加成功");
                         } else {
                             showToast("白名单该号码已存在哦~");
                         }
@@ -172,7 +177,7 @@ public class CallRecordActivity extends BaseActivity {
                         if (!phoneBeanList.contains(bean)) {
                             phoneBeanList.add(0, bean);
                             mPreferHelper.saveValue(phoneBeanList);
-                            showToast("添加成功");
+                            showToast("黑名单添加成功");
                         } else {
                             showToast("黑名单该号码已存在哦~");
                         }
